@@ -1,10 +1,15 @@
 {% extends "base.html" %}
+{% block title %}{% if object %}Editar receta{% else %}Nueva receta{% endif %}{% endblock %}
 {% block content %}
-<h1>{% if object %}Editar receta{% else %}Nueva receta{% endif %}</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-  <a href="{% url 'recetas:lista' %}">Cancelar</a>
-</form>
+<div class="page-head aparece"><div><h1>{% if object %}Editar receta{% else %}Nueva receta{% endif %}</h1><p>Un ingrediente por línea, al menos dos.</p></div></div>
+<div class="card form-card aparece">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="acciones">
+      <button class="btn" type="submit">Guardar receta</button>
+      <a class="btn btn-sec" href="{% url 'recetas:lista' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
 {% endblock %}

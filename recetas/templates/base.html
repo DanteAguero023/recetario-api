@@ -1,32 +1,83 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Mi Recetario{% endblock %}</title>
-  <style>
-    body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:1rem;color:#222}
-    nav{display:flex;gap:1rem;align-items:center;border-bottom:1px solid #ddd;padding-bottom:.75rem;margin-bottom:1rem}
-    nav .sp{flex:1} nav form{display:inline}
-    .card{display:block;border:1px solid #ddd;border-radius:8px;padding:.6rem .9rem;margin-bottom:.6rem;text-decoration:none;color:inherit}
-    .errorlist{color:#b00020;padding-left:1rem}
-    pre{white-space:pre-wrap;font-family:inherit}
-    button,.btn{padding:.4rem .8rem;cursor:pointer}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#5a0f26">
+  <title>{% block title %}Mi Recetario{% endblock %} · Mi Recetario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'recetas/styles.css' %}">
+  <script>
+    /* Aplica las preferencias ANTES de pintar (evita el parpadeo) y decide si hay splash. */
+    (function () {
+      var d = document.documentElement, g = function (k, v) { try { return localStorage.getItem(k) || v; } catch (e) { return v; } };
+      var t = g("rc-tema", "auto"); if (t !== "auto") d.setAttribute("data-theme", t);
+      d.setAttribute("data-anim", g("rc-anim", "on")); d.setAttribute("data-size", g("rc-tam", "normal"));
+      var visto = false; try { visto = sessionStorage.getItem("rc-splash-visto") === "1"; } catch (e) {}
+      if (!visto && g("rc-splash", "on") === "on") d.classList.add("splash-on");
+    })();
+  </script>
+  <script src="{% static 'recetas/app.js' %}" defer></script>
 </head>
 <body>
-  <nav>
-    <a href="{% url 'recetas:lista' %}"><strong>🍲 Mi Recetario</strong></a>
-    {% if user.is_authenticated %}<a href="{% url 'recetas:crear' %}">Nueva receta</a>{% endif %}
-    <span class="sp"></span>
-    {% if user.is_authenticated %}
-      <span>Hola, {{ user.username }}</span>
-      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Salir</button></form>
-    {% else %}
-      <a href="{% url 'login' %}">Ingresar</a>
-      <a href="{% url 'recetas:registro' %}">Registrarse</a>
-    {% endif %}
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  </svg>
+
+  <div class="splash" id="splash" role="status" aria-label="Cargando Mi Recetario">
+    <div>
+      <div class="splash-olla"><span class="vapor"></span><span class="vapor"></span><span class="vapor"></span>🍲</div>
+      <h1>Mi Recetario</h1>
+      <p>Cocina, comparte, repite.</p>
+      <div class="carga"><i></i></div>
+      <small>Toca para continuar</small>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="contenedor">
+      <a class="marca" href="{% url 'recetas:lista' %}"><span class="logo">🍲</span> Mi Recetario</a>
+      <nav class="nav-desktop" aria-label="Principal">
+        <a href="{% url 'recetas:lista' %}" {% if request.resolver_match.url_name == 'lista' %}class="activo"{% endif %}><svg class="i"><use href="#i-home"/></svg>Recetas</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'recetas:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="activo"{% endif %}><svg class="i"><use href="#i-chart"/></svg>Dashboard</a>
+        <a href="{% url 'recetas:crear' %}" {% if request.resolver_match.url_name == 'crear' %}class="activo"{% endif %}><svg class="i"><use href="#i-plus"/></svg>Nueva receta</a>
+        <a href="{% url 'recetas:configuracion' %}" {% if request.resolver_match.url_name == 'configuracion' %}class="activo"{% endif %}><svg class="i"><use href="#i-sliders"/></svg>Configuración</a>
+        {% endif %}
+      </nav>
+      <span class="sp"></span>
+      {% if user.is_authenticated %}
+        <span class="usuario">Hola, {{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" data-splash-reset>{% csrf_token %}
+          <button class="btn-icono" aria-label="Cerrar sesión"><svg class="i"><use href="#i-logout"/></svg><span class="usuario">Salir</span></button>
+        </form>
+      {% else %}
+        <a class="nav-link" href="{% url 'login' %}">Ingresar</a>
+        <a class="btn-icono" href="{% url 'recetas:registro' %}" style="color:#fff">Registrarse</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="contenedor">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if user.is_authenticated %}
+  <nav class="tabbar" aria-label="Navegación móvil">
+    <a href="{% url 'recetas:lista' %}" {% if request.resolver_match.url_name == 'lista' %}class="activo"{% endif %}><svg class="i"><use href="#i-home"/></svg>Recetas</a>
+    <a href="{% url 'recetas:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="activo"{% endif %}><svg class="i"><use href="#i-chart"/></svg>Dashboard</a>
+    <a href="{% url 'recetas:crear' %}" {% if request.resolver_match.url_name == 'crear' %}class="activo"{% endif %}><svg class="i"><use href="#i-plus"/></svg>Nueva</a>
+    <a href="{% url 'recetas:configuracion' %}" {% if request.resolver_match.url_name == 'configuracion' %}class="activo"{% endif %}><svg class="i"><use href="#i-sliders"/></svg>Ajustes</a>
   </nav>
-  {% block content %}{% endblock %}
+  {% endif %}
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

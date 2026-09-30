@@ -21,9 +21,10 @@ python manage.py runserver
 
 - Web: <http://127.0.0.1:8000/> · API navegable: `/api/`
 - Admin: `/gestion-recetas/` (la ruta sale de `ADMIN_URL` en `.env`; crea el usuario con `python manage.py createsuperuser`)
+  - **Ojo:** `/admin/` devuelve 404 a propósito (auditoría OWASP API5). Si quieres volver a esa ruta, cambia o borra `ADMIN_URL` en `.env` y reinicia el servidor.
 - Usuarios demo (solo desarrollo): `ana` / `Ana-Recetas-2026` y `beto` / `Beto-Recetas-2026`
 - El archivo `.env` **no se sube** (está en `.gitignore`); `.env.example` muestra qué variables hacen falta.
-- Pruebas: `python manage.py test recetas` (23 tests).
+- Pruebas: `python manage.py test recetas` (29 tests).
 
 ## Parte 1 · App web
 
@@ -35,6 +36,22 @@ python manage.py runserver
 | Solo el autor edita o borra | `SoloAutorMixin`: otro usuario recibe **403** |
 
 El autor nunca viene del formulario: `form_valid` asigna `request.user`.
+
+### Páginas web y diseño
+
+| URL | Página | Acceso |
+|---|---|---|
+| `/` | Recetas de la comunidad (tarjetas, paginadas) | pública |
+| `/receta/<id>/` | Detalle | pública |
+| `/dashboard/` | Resumen personal: mis recetas, tiempo promedio, reparto por dificultad y últimas recetas | login |
+| `/configuracion/` | Tema claro/oscuro/automático, tamaño de texto, animaciones, splash y cambio de contraseña | login |
+
+- **Estilos**: `recetas/static/recetas/styles.css` (paleta burdeos y rojos con variables CSS, modo oscuro) y `app.js` (splash y preferencias).
+- **Splash de bienvenida**: aparece una vez por sesión del navegador y de nuevo al ingresar; se cierra solo o con un toque.
+- **Responsive**: en teléfono hay barra inferior de navegación; desde 768 px pasa a menú superior. Las grillas se adaptan a 1, 2 o 3 columnas.
+- **Animaciones**: entrada escalonada de tarjetas, barras del dashboard y transiciones. Se pueden apagar en Configuración y respetan `prefers-reduced-motion`.
+- Las preferencias se guardan en `localStorage` del navegador, no en la base de datos.
+- Con `DEBUG=False`, Django no sirve los archivos estáticos: hay que ejecutar `collectstatic` y servirlos con el servidor web o WhiteNoise.
 
 ## Parte 2 · API REST
 
@@ -94,11 +111,11 @@ HTTP 403
 
 ### Pruebas automáticas
 
-`python manage.py test recetas` → **23 tests OK**.
+`python manage.py test recetas` → **29 tests OK**.
 
 | Archivo | Qué comprueba |
 |---|---|
-| `recetas/tests.py` (9) | Web: lista/detalle públicos, crear exige login, autor asignado por el servidor, validaciones, autor edita/borra, ajeno recibe 403, registro + login + logout |
+| `recetas/tests.py` (15) | Web: lista/detalle públicos, crear exige login, autor asignado por el servidor, validaciones, autor edita/borra, ajeno recibe 403, registro + login + logout, dashboard (solo cuenta lo propio), configuración y cambio de contraseña, login redirige al dashboard |
 | `recetas/tests_api.py` (14) | API: 200 al listar (paginado), 401 sin token, JWT + 201, el `autor` enviado por el cliente se ignora, campos expuestos exactos, 400 por validación, 403 en PUT/PATCH/DELETE ajeno, `/mios/`, refresh rotado y revocado, throttling (429) en la API y en `/api/token/`, bloqueo de la cuenta tras 5 logins fallidos |
 
 ## Auditoría de seguridad con IA (OWASP API Security Top 10, 2023)

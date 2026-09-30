@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Configuración{% endblock %}
+{% block content %}
+<div class="page-head aparece"><div><h1>Configuración</h1><p>Personaliza cómo se ve la app. Se guarda en este dispositivo.</p></div></div>
+
+<div data-stagger style="display:grid;gap:1rem;max-width:760px">
+  <section class="card aparece">
+    <div class="perfil">
+      <div class="avatar">{{ user.username|first|upper }}</div>
+      <div><strong>{{ user.username }}</strong><br><small>Sesión iniciada</small></div>
+    </div>
+    <div class="acciones">
+      <a class="btn btn-sec" href="{% url 'password_change' %}">Cambiar contraseña</a>
+      <a class="btn btn-sec" href="{% url 'recetas:dashboard' %}">Ir al dashboard</a>
+    </div>
+  </section>
+
+  <section class="card aparece" id="ajustes">
+    <h2>Apariencia</h2>
+    <div class="ajuste">
+      <div><div class="tit">Tema</div><div class="desc">Automático sigue el modo de tu dispositivo.</div></div>
+      <div class="segmentado" role="radiogroup" aria-label="Tema">
+        <input type="radio" name="tema" id="t-auto" value="auto"><label for="t-auto">Automático</label>
+        <input type="radio" name="tema" id="t-claro" value="claro"><label for="t-claro">Claro</label>
+        <input type="radio" name="tema" id="t-oscuro" value="oscuro"><label for="t-oscuro">Oscuro</label>
+      </div>
+    </div>
+    <div class="ajuste">
+      <div><div class="tit">Tamaño del texto</div><div class="desc">Útil en pantallas pequeñas o para leer mejor.</div></div>
+      <div class="segmentado" role="radiogroup" aria-label="Tamaño del texto">
+        <input type="radio" name="tam" id="s-normal" value="normal"><label for="s-normal">Normal</label>
+        <input type="radio" name="tam" id="s-grande" value="grande"><label for="s-grande">Grande</label>
+      </div>
+    </div>
+    <div class="ajuste fila">
+      <div><div class="tit">Animaciones</div><div class="desc">Transiciones y movimiento de la interfaz.</div></div>
+      <label class="interruptor"><input type="checkbox" name="anim" aria-label="Animaciones"><span></span></label>
+    </div>
+    <div class="ajuste fila">
+      <div><div class="tit">Pantalla de bienvenida</div><div class="desc">Muestra el splash al ingresar a la app.</div></div>
+      <label class="interruptor"><input type="checkbox" name="splash" aria-label="Pantalla de bienvenida"><span></span></label>
+    </div>
+    <div class="acciones">
+      <button class="btn btn-sec" type="button" id="ver-splash">Ver splash</button>
+      <button class="btn btn-sec" type="button" id="restablecer">Restablecer</button>
+    </div>
+  </section>
+</div>
+{% endblock %}

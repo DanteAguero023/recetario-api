@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero aparece">
+  <h1>Hola, {{ user.username }} 👋</h1>
+  <p>Este es el resumen de tu cocina.</p>
+</section>
+
+<div class="stats" data-stagger>
+  <div class="card stat aparece"><div class="num">{{ total_mias }}</div><div class="etq">Mis recetas</div></div>
+  <div class="card stat aparece"><div class="num">{{ tiempo_promedio }}<small style="font-size:1rem"> min</small></div><div class="etq"><svg class="i"><use href="#i-clock"/></svg>Tiempo promedio</div></div>
+  <div class="card stat aparece"><div class="num">{{ total_comunidad }}</div><div class="etq">En la comunidad</div></div>
+  <a class="card stat card-link aparece" href="{% url 'recetas:crear' %}"><div class="num">＋</div><div class="etq">Nueva receta</div></a>
+</div>
+
+<div class="paneles" data-stagger>
+  <section class="card aparece">
+    <h2>Por dificultad</h2>
+    {% if total_mias %}
+      {% for d in por_dificultad %}
+      <div class="barra-fila">
+        <div class="cab"><span>{{ d.etiqueta }}</span><span>{{ d.n }} · {{ d.pct }}%</span></div>
+        <div class="barra"><i style="--w: {{ d.pct }}%"></i></div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="vacio"><span class="emoji">📊</span>Publica tu primera receta para ver tus estadísticas.</div>
+    {% endif %}
+  </section>
+
+  <section class="card aparece">
+    <h2>Mis últimas recetas</h2>
+    {% if ultimas %}
+    <ul class="lista-simple">
+      {% for r in ultimas %}
+      <li>
+        <a href="{% url 'recetas:detalle' r.pk %}"><strong>{{ r.titulo }}</strong></a>
+        <span class="badge {{ r.dificultad }}">{{ r.get_dificultad_display }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <div class="vacio"><span class="emoji">🥘</span>Aún no tienes recetas.</div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Avg, Count
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
 from .forms import RecetaForm
 from .models import Receta
@@ -49,10 +50,42 @@ class RecetaDeleteView(LoginRequiredMixin, SoloAutorMixin, DeleteView):
 class RegistroView(CreateView):
     form_class = UserCreationForm
     template_name = "registration/registro.html"
-    success_url = reverse_lazy("recetas:lista")
+    success_url = reverse_lazy("recetas:dashboard")
 
     def form_valid(self, form):
         respuesta = super().form_valid(form)
         # con varios backends (axes + ModelBackend) hay que indicar cual usar
         login(self.request, self.object, backend="django.contrib.auth.backends.ModelBackend")
         return respuesta
+
+
+class DashboardView(LoginRequiredMixin, TemplateView):
+    """Resumen personal: mis cifras, reparto por dificultad y ultimas recetas."""
+
+    template_name = "recetas/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        mias = Receta.objects.filter(autor=self.request.user)
+        total = mias.count()
+        conteo = dict(mias.values_list("dificultad").annotate(n=Count("id")))
+        ctx["total_mias"] = total
+        ctx["total_comunidad"] = Receta.objects.count()
+        ctx["tiempo_promedio"] = round(mias.aggregate(p=Avg("tiempo_minutos"))["p"] or 0)
+        ctx["por_dificultad"] = [
+            {
+                "etiqueta": etiqueta,
+                "clave": clave,
+                "n": conteo.get(clave, 0),
+                "pct": round(conteo.get(clave, 0) * 100 / total) if total else 0,
+            }
+            for clave, etiqueta in Receta.Dificultad.choices
+        ]
+        ctx["ultimas"] = mias[:5]
+        return ctx
+
+
+class ConfiguracionView(LoginRequiredMixin, TemplateView):
+    """Preferencias de interfaz (se guardan en el navegador) y acceso a la cuenta."""
+
+    template_name = "recetas/configuracion.html"

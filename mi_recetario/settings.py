@@ -137,7 +137,7 @@ MAILERS = {
 }
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "recetas:lista"
+LOGIN_REDIRECT_URL = "recetas:dashboard"
 LOGOUT_REDIRECT_URL = "recetas:lista"
 
 # --- DRF (https://www.django-rest-framework.org/api-guide/settings/)

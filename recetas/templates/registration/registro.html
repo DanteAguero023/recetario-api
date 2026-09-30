@@ -1,9 +1,16 @@
 {% extends "base.html" %}
+{% block title %}Crear cuenta{% endblock %}
 {% block content %}
-<h1>Crear cuenta</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Registrarme</button>
-</form>
+<div class="card form-card aparece">
+  <h1>Crear cuenta</h1>
+  <p class="muted">Publica tus recetas y gestiona las tuyas.</p>
+  <form method="post" data-splash-reset>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="acciones">
+      <button class="btn" type="submit">Registrarme</button>
+      <a class="btn btn-sec" href="{% url 'login' %}">Ya tengo cuenta</a>
+    </div>
+  </form>
+</div>
 {% endblock %}

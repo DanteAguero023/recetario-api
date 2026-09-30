@@ -10,5 +10,7 @@ urlpatterns = [
     path("receta/nueva/", views.RecetaCreateView.as_view(), name="crear"),
     path("receta/<int:pk>/editar/", views.RecetaUpdateView.as_view(), name="editar"),
     path("receta/<int:pk>/borrar/", views.RecetaDeleteView.as_view(), name="borrar"),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+    path("configuracion/", views.ConfiguracionView.as_view(), name="configuracion"),
     path("registro/", views.RegistroView.as_view(), name="registro"),
 ]

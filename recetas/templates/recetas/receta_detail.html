@@ -1,14 +1,25 @@
 {% extends "base.html" %}
 {% block title %}{{ object.titulo }}{% endblock %}
 {% block content %}
-<h1>{{ object.titulo }}</h1>
-<p><small>{{ object.get_dificultad_display }} · {{ object.tiempo_minutos }} min · por {{ object.autor.username }} · {{ object.creado|date:"d/m/Y H:i" }}</small></p>
-<h2>Ingredientes</h2>
-<pre>{{ object.ingredientes }}</pre>
-<h2>Preparación</h2>
-<pre>{{ object.preparacion }}</pre>
-{% if user == object.autor %}
-  <a class="btn" href="{% url 'recetas:editar' object.pk %}">Editar</a>
-  <a class="btn" href="{% url 'recetas:borrar' object.pk %}">Borrar</a>
-{% endif %}
+<section class="hero aparece">
+  <h1>{{ object.titulo }}</h1>
+  <p><span class="badge {{ object.dificultad }}">{{ object.get_dificultad_display }}</span> &nbsp;{{ object.tiempo_minutos }} min · por {{ object.autor.username }} · {{ object.creado|date:"d/m/Y" }}</p>
+</section>
+<div class="receta-cuerpo" data-stagger>
+  <article class="card aparece">
+    <h2>Ingredientes</h2>
+    <ul class="ingredientes">{% for linea in object.ingredientes.splitlines %}{% if linea.strip %}<li>{{ linea }}</li>{% endif %}{% endfor %}</ul>
+  </article>
+  <article class="card aparece">
+    <h2>Preparación</h2>
+    <pre>{{ object.preparacion }}</pre>
+  </article>
+</div>
+<div class="acciones">
+  <a class="btn btn-sec" href="{% url 'recetas:lista' %}">← Volver</a>
+  {% if user == object.autor %}
+    <a class="btn" href="{% url 'recetas:editar' object.pk %}">Editar</a>
+    <a class="btn btn-peligro" href="{% url 'recetas:borrar' object.pk %}">Borrar</a>
+  {% endif %}
+</div>
 {% endblock %}

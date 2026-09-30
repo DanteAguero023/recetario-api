@@ -1,17 +1,29 @@
 {% extends "base.html" %}
+{% block title %}Recetas{% endblock %}
 {% block content %}
-<h1>Recetas</h1>
-{% for receta in object_list %}
-<a class="card" href="{% url 'recetas:detalle' receta.pk %}">
-  <strong>{{ receta.titulo }}</strong><br>
-  <small>{{ receta.get_dificultad_display }} · {{ receta.tiempo_minutos }} min · por {{ receta.autor.username }}</small>
-</a>
-{% empty %}<p>Aún no hay recetas.</p>{% endfor %}
+<section class="hero aparece">
+  <h1>Recetas de la comunidad</h1>
+  <p>Descubre, cocina y comparte. {% if not user.is_authenticated %}<a href="{% url 'recetas:registro' %}" style="color:#fff;text-decoration:underline">Crea tu cuenta</a> para publicar las tuyas.{% endif %}</p>
+</section>
+<div class="grid" data-stagger>
+  {% for receta in object_list %}
+  <a class="card card-link aparece" href="{% url 'recetas:detalle' receta.pk %}">
+    <h3>{{ receta.titulo }}</h3>
+    <div class="meta">
+      <span class="badge {{ receta.dificultad }}">{{ receta.get_dificultad_display }}</span>
+      <span><svg class="i"><use href="#i-clock"/></svg>{{ receta.tiempo_minutos }} min</span>
+      <span><svg class="i"><use href="#i-user"/></svg>{{ receta.autor.username }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="card vacio" style="grid-column:1/-1"><span class="emoji">🍽️</span>Aún no hay recetas. ¡Sé la primera persona en publicar una!</div>
+  {% endfor %}
+</div>
 {% if is_paginated %}
-<p>
-  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>{% endif %}
-  Página {{ page_obj.number }} de {{ paginator.num_pages }}
-  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Siguiente →</a>{% endif %}
-</p>
+<div class="paginacion">
+  {% if page_obj.has_previous %}<a class="btn btn-sec" href="?page={{ page_obj.previous_page_number }}">← Anterior</a>{% endif %}
+  <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-sec" href="?page={{ page_obj.next_page_number }}">Siguiente →</a>{% endif %}
+</div>
 {% endif %}
 {% endblock %}
