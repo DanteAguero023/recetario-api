@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mi Recetario{% endblock %}</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:860px;margin:0 auto;padding:1rem;color:#222}
+    nav{display:flex;gap:1rem;align-items:center;border-bottom:1px solid #ddd;padding-bottom:.75rem;margin-bottom:1rem}
+    nav .sp{flex:1} nav form{display:inline}
+    .card{display:block;border:1px solid #ddd;border-radius:8px;padding:.6rem .9rem;margin-bottom:.6rem;text-decoration:none;color:inherit}
+    .errorlist{color:#b00020;padding-left:1rem}
+    pre{white-space:pre-wrap;font-family:inherit}
+    button,.btn{padding:.4rem .8rem;cursor:pointer}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{% url 'recetas:lista' %}"><strong>🍲 Mi Recetario</strong></a>
+    {% if user.is_authenticated %}<a href="{% url 'recetas:crear' %}">Nueva receta</a>{% endif %}
+    <span class="sp"></span>
+    {% if user.is_authenticated %}
+      <span>Hola, {{ user.username }}</span>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Salir</button></form>
+    {% else %}
+      <a href="{% url 'login' %}">Ingresar</a>
+      <a href="{% url 'recetas:registro' %}">Registrarse</a>
+    {% endif %}
+  </nav>
+  {% block content %}{% endblock %}
+</body>
+</html>

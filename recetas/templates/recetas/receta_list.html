@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Recetas</h1>
+{% for receta in object_list %}
+<a class="card" href="{% url 'recetas:detalle' receta.pk %}">
+  <strong>{{ receta.titulo }}</strong><br>
+  <small>{{ receta.get_dificultad_display }} · {{ receta.tiempo_minutos }} min · por {{ receta.autor.username }}</small>
+</a>
+{% empty %}<p>Aún no hay recetas.</p>{% endfor %}
+{% if is_paginated %}
+<p>
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>{% endif %}
+  Página {{ page_obj.number }} de {{ paginator.num_pages }}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Siguiente →</a>{% endif %}
+</p>
+{% endif %}
+{% endblock %}
