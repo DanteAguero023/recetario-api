@@ -10,7 +10,7 @@ Modelo `Receta`: `titulo`, `ingredientes`, `preparacion`, `tiempo_minutos`, `dif
 ## Cómo correrlo
 
 ```bash
-git clone <URL-del-repo> && cd mi_recetario
+git clone https://github.com/DanteAguero023/recetario-api.git && cd recetario-api
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env            # y cambia SECRET_KEY (y ADMIN_URL si quieres) por valores propios
